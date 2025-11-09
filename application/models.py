@@ -12,6 +12,7 @@ class Doctor(db.Model):
     id=db.Column(db.Integer, primary_key=True, autoincrement=True)
     username=db.Column(db.String(64), unique=True, nullable=False)
     password=db.Column(db.String(64), nullable=False)
+    blacklisted=db.Column(db.Enum('true','false'), nullable=False)
 
     appointments=db.relationship("Appointment", back_populates="doctor")
     departments=db.relationship("Department", secondary="department_doctor", back_populates="doctors")
@@ -22,6 +23,7 @@ class Patient(db.Model):
     id=db.Column(db.Integer, primary_key=True, autoincrement=True)
     username=db.Column(db.String(64), unique=True, nullable=False)
     password=db.Column(db.String(64), nullable=False)
+    blacklisted=db.Column(db.Enum('true','false'), nullable=False)
 
     appointments=db.relationship("Appointment", back_populates="patient")
 

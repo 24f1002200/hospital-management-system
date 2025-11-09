@@ -6,6 +6,84 @@
     <title>Admin</title>
 </head>
 <body>
-    <h1>Welcome Admin</h1>
+    <div class="top-nav">
+        <h1>Welcome Admin</h1>
+        <div class="search">
+            <div class="search-bar">
+                <form action="/admin/search" method="post">
+                    <input type="text" name="search-string">
+                    <button type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="doctor-details">
+        <h2>Registered Doctors</h2>
+        <div class="button">
+            <button type="button" onclick="location.href='/register/doctor'">create</button>
+        </div>
+
+        <div class="doctor-list">
+            <table>
+            {% for doctor in doctor_list %}
+                <tr>
+                    <td>{{doctor.username}}</td>
+                    <td><a href="/update/doctor/{{doctor.username}}">edit</a></td>
+                    <td><a href="/delete/doctor/{{doctor.username}}">delete</a></td>
+                    <td><a href="blacklist/doctor/{{doctor.username}}">{% if doctor.blacklisted=="true" %}un{% endif %}blacklist</a></td>
+                </tr>
+            {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <div class="patient-details">
+        <h2>Registered Patients</h2>
+
+        <div class="patient-list">
+            <table>
+            {% for patient in patient_list %}
+                <tr>
+                    <td>{{patient.username[8:]}}</td>
+                    <td><a href="/update/patient/{{patient.username}}">edit</a></td>
+                    <td><a href="/delete/patient/{{patient.username}}">delete</a></td>
+                    <td><a href="/blacklist/patient/{{patient.username}}">blacklist</a></td>
+                </tr>
+            {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <div class="appointment-details">
+        <h2>Upcoming Appointments</h2>
+
+        <div class="appointment-list">
+            <table>
+                <th>
+                    <td>Sr. No.</td>
+                    <td>Patient Name</td>
+                    <td>Doctor Name</td>
+                    <td>Department</td>
+                    <td>Patient History</td>
+                </th>
+            {% for appointment in appointment_list %}
+                <tr>
+                    <td>{{appointment.id}}</td>
+                    <td>{{appointment.patient.username}}</td>
+                    <td>{{appointment.doctor.username}}</td>
+                    <td>
+                        {% for department in appointment.doctor.departments %}
+                            {{ department.department_name}} {% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td><a href="/view/patient/{{appointment.patient.username}}">view</a></td>
+                </tr>
+            {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <button type="button" onclick="location.href='/logout'">log out</button>
 </body>
 </html>

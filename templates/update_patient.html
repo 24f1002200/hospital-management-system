@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Patient</title>
+</head>
+<body>
+    <h1>Update Patient : {{uname[8:]}}</h1>
+
+    <form action="/update/patient/{{uname}}" method="post">
+        <label for="password">Password</label> <br>
+        <input type="password" name="password" >
+        <br>
+        <button type="submit">Update</button>
+    </form>
+</body>
+</html>

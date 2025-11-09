@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient History</title>
+</head>
+<body>
+    <h1>Patient History</h1>
+    <p>Patient name : {{patient.username[8:]}}</p>
+    {% if patient.appointments | length %}
+    <p>Doctor's name : Dr. {{patient.appointments[patient.appointments|length -1].doctor.username}}</p>
+    <p>Department : {{patient.appointments[patient.appointments|length -1].doctor.departments[0]}}</p>
+
+    <table>
+        <th>
+            <td>Visit No.</td>
+            <td>Visit Type</td>
+            <td>Tests Done</td>
+            <td>Diagnosis</td>
+            <td>Prescription</td>
+            <td>Medicines</td>
+        </th>
+        {% for entry in history %}
+            <tr>
+                <td>{{entry['visit_no']}}</td>
+                <td>{{entry['visit_type']}}</td>
+                <td>
+                    <ul>
+                        {% for test in entry['tests_done'] %}
+                            <li>{{test}}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td>{{entry['diagnosis']}}</td>
+                <td>{{entry['prescription']}}</td>
+                <td>
+                    <ul>
+                        {% for medicine in entry['medicines'] %}
+                            <li>{{medicine}}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        No Appointments
+    {% endif %}
+
+    <div class="button">
+        <button type="button" onclick="location.href='/{{who}}'">Back</button>
+    </div>
+</body>
+</html>

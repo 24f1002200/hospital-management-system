@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Doctor</title>
+</head>
+<body>
+    <h1>Update Doctor : {{uname}}</h1>
+
+    <form action="/update/doctor/{{uname}}" method="post">
+        <label for="password">Password</label> <br>
+        <input type="password" name="password" >
+        <br>
+        <label for="department">Department</label> <br>
+        <input type="text" name="department" >
+        <br>
+        <input type="radio" name="append">
+        <label for="append">Append this department</label>
+        <button type="submit">Update</button>
+    </form>
+</body>
+</html>
