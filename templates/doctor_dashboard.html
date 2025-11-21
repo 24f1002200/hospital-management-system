@@ -7,5 +7,34 @@
 </head>
 <body>
     <h1>Welcome Doctor {{doc.username}}</h1>
+    <h2>Upcoming Appointments</h2>
+    <table>
+        <th>
+            <td>Sr No.</td>
+            <td>Patient Name</td>
+            <td>Patient History</td>
+            <td>Actions</td>
+        </th>
+        {% for appointment in appointment_list %}
+            <tr>
+                <td>{{appointment.id}}</td>
+                <td>{{appointment.patient.username}}</td>
+                <td><a href="/update/patient/history/{{appointment.id}}">update</a></td>
+                <td><a href="/appointment/complete/{{appointment.id}}">mark as complete</a> <a href="/appointment/cancel/{{appointment.id}}">cancel</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Assigned Patients</h2>
+    <table>
+        {% for patient in patient_list %}
+            <tr>
+                <td>{{patient}}</td>
+                <td><a href="/view/patient/{{patient}}/{{doc.id}}">view</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <p><a href="/doctor/update/availability/{{doc.id}}">Provide Availability</a></p>
 </body>
 </html>

@@ -49,7 +49,7 @@
     {% endif %}
 
     <div class="button">
-        <button type="button" onclick="location.href='/{{who}}'">Back</button>
+        <button type="button" onclick="location.href='/{{who}}/{% if who == 'doctor' %}{{doctor.username}}{% endif %}'">Back</button>
     </div>
 </body>
 </html>

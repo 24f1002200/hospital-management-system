@@ -12,13 +12,17 @@ def setup():
     db.init_app(app)
     with app.app_context():
         db.create_all()
+        admin=Admin(username="admin",password="123456") # Change admin details after..
+        admins=db.session.query(Admin).all()
+        for admin in admins:
+            db.session.delete(admin)
+        db.session.add(admin)
+        patient=db.session.query(Patient).filter_by(username="patient-dummy_001").first()
+        if not patient:
+            patient=Patient(username="patient-dummy_001",password="dummy_001",blacklisted='false')
+            db.session.add(patient)
+        db.session.commit()
     app.app_context().push()
-    admin=Admin(username="admin",password="123456") # Change admin details after..
-    admins=db.session.query(Admin).all()
-    for admin in admins:
-        db.session.delete(admin)
-    db.session.add(admin)
-    db.session.commit()
     return app
 
 app=setup()

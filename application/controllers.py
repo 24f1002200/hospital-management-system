@@ -95,7 +95,141 @@ def doctor(username):
         doc=db.session.query(Doctor).filter_by(username=username).first()
         if not doc:
             return abort(404)
-        return render_template("doctor_dashboard.html",doc=doc)
+        from datetime import datetime
+        now=datetime.now()
+        appointments=db.session.query(Appointment).filter_by(doctor_id=doc.id).order_by(Appointment.date,Appointment.time).all()
+        appointments=[
+            appointment for appointment in appointments
+            if (appointment.patient.username!="patient-dummy_001") or (not(appointment.status=="Completed" or appointment.status=="Cancelled") and appointment.date<=now.date())
+        ]
+        patients=[]
+        for appointment in appointments:
+            if appointment.patient.username not in patients:
+                patients.append(appointment.patient.username)
+        return render_template("doctor_dashboard.html",doc=doc,appointment_list=appointments,patient_list=patients)
+    
+@app.route('/doctor/update/availability/<doctor_id>',methods=['GET','POST'])
+def update_doctor_availability(doctor_id):
+    if session.get('user_type')!='doctor':
+        return abort(403)
+    doctor=db.session.query(Doctor).filter_by(id=doctor_id).first()
+    if not doctor:
+        return abort(404)
+    if request.method=='GET':
+        appointments=db.session.query(Appointment).filter_by(doctor_id=doctor_id).order_by(Appointment.date,Appointment.time).all()
+        from datetime import datetime,timedelta
+        now=datetime.now()
+        availability=dict()
+        for i in range(7):
+            date = now.date() + timedelta(days=i)
+            date_str = date.strftime('%d-%m-%Y')
+            availability[date_str] = [True, True]
+
+        appointments = db.session.query(Appointment).filter_by(doctor_id=doctor_id).all()
+        appointments=[
+            appointment for appointment in appointments
+            if (not(appointment.status=="Completed" or appointment.status=="Cancelled") and appointment.date>=now.date())
+        ]
+        for appointment in appointments:
+            appointment_date = appointment.date.strftime('%d-%m-%Y')
+            if appointment_date in availability:
+                if appointment.time == datetime.strptime('08:00:00', '%H:%M:%S').time():
+                    availability[appointment_date][0] = False
+                elif appointment.time == datetime.strptime('16:00:00', '%H:%M:%S').time():
+                    availability[appointment_date][1] = False
+        return render_template('doctor_availability.html',doctor=doctor,availability=availability)
+    elif request.method=='POST':
+        availability_data=request.form.to_dict(flat=False)
+        from datetime import datetime
+        for key,slots in availability_data.items():
+            date=key.split('[')[1].split(']')[0]
+            slot=key.split('[')[2].split(']')[0]
+            date_obj=datetime.strptime(date,'%d-%m-%Y').date()
+            if slot=='morning':
+                print("here")
+                morning_not_available='true' in slots
+                appointment = db.session.query(Appointment).filter_by(
+                    doctor_id=doctor_id, date=date_obj, time=datetime.strptime('08:00:00', '%H:%M:%S').time()
+                ).first()
+                if morning_not_available and not appointment:
+                    patient=db.session.query(Patient).filter_by(username='patient-dummy_001').first()
+                    new_appointment=Appointment(
+                        doctor_id=doctor_id,
+                        patient_id=patient.id,
+                        date=date_obj,
+                        time=datetime.strptime('08:00:00',"%H:%M:%S").time(),
+                        status="Booked"
+                    )
+                    db.session.add(new_appointment)
+            if slot=='afternoon':
+                afternoon_not_available='true' in slots
+                appointment = db.session.query(Appointment).filter_by(
+                    doctor_id=doctor_id, date=date_obj, time=datetime.strptime('16:00:00', '%H:%M:%S').time()
+                ).first()
+                if afternoon_not_available and not appointment:
+                    patient=db.session.query(Patient).filter_by(username='patient-dummy_001').first()
+                    new_appointment=Appointment(
+                        doctor_id=doctor_id,
+                        patient_id=patient.id,
+                        date=date_obj,
+                        time=datetime.strptime('16:00:00',"%H:%M:%S").time(),
+                        status="Booked"
+                    )
+                    db.session.add(new_appointment)
+        db.session.commit()
+        return redirect('/doctor/update/availability/'+doctor_id)
+
+                
+
+
+
+
+@app.route('/update/patient/history/<appointment_id>',methods=["GET","POST"])
+def update_patient_history(appointment_id):
+    if session.get('user_type')!='doctor':
+        return abort(403)
+    appointment=db.session.query(Appointment).filter_by(id=appointment_id).first()
+    if not appointment:
+        return abort(404)
+    if request.method=="GET":
+        return render_template('update_patient_history.html',appointment=appointment)
+    elif request.method=="POST":
+        visit_type=request.form.get('visit_type')
+        test_done=request.form.get('test_done') # Comma separated string
+        diagnosis=request.form.get('diagnosis')
+        medicines=request.form.get('medicines') # Comma separated string
+        prescription=request.form.get('prescription')
+        # treatment.notes look like ::::  "<visit_type> ; <tests-done> ; <Medicines>"
+        notes=f"{visit_type if visit_type else ''} ; {test_done if test_done else ''} ; {medicines if medicines else ''}"
+        if appointment.treatments:
+            appointment.treatments[0].diagnosis=diagnosis
+            appointment.treatments[0].prescription=prescription
+            appointment.treatments[0].notes=notes
+        else:
+            treatment=Treatment(
+                diagnosis=diagnosis,
+                prescription=prescription,
+                notes=notes,
+                appointment_id=appointment_id
+            )
+            db.session.add(treatment)
+        db.session.commit()
+        return redirect('/doctor/'+appointment.doctor.username)
+
+@app.route('/appointment/<action>/<appointment_id>',methods=["GET"])
+def appointment_action(action,appointment_id):
+    if session.get('user_type')!='doctor':
+        return abort(403)
+    appointment=db.session.query(Appointment).filter_by(id=appointment_id).first()
+    if not appointment:
+        return abort(404)
+    if request.method=="GET":
+        if action=='complete':
+            appointment.status='Completed'
+        elif action=='cancel':
+            appointment.status='Cancelled'
+        db.session.commit()
+        return redirect('/doctor/'+appointment.doctor.username)
     
 @app.route('/patient/<username>',methods=["GET","POST"])
 def patient(username):
@@ -233,7 +367,8 @@ def toggle_blacklist(role,username):
         return redirect('/admin')
 
 @app.route('/view/patient/<username>',methods=["GET"])
-def patient_history(username):
+@app.route('/view/patient/<username>/<doctor_id>',methods=["GET"])
+def patient_history(username,doctor_id=None):
     if session.get('user_type') != 'admin' and session.get('user_type') != 'doctor' and session.get('user_type') != 'patient':
         print(session.get('user_type'))
         return abort(403)
@@ -242,18 +377,25 @@ def patient_history(username):
         return abort(404)
     history=[]
     for i in range(len(patient.appointments)):
-        treatment=patient.appointments[i].treatment
+        treatments=patient.appointments[i].treatments
         # treatment.notes look like ::::  "<visit_type> ; <tests-done> ; <Medicines>"
-        app_hist={
-            "visit_no":str(i),
-            "visit_type":treatment.notes.split(';')[0].strip(),
-            "tests_done":treatment.notes.split(';')[1].strip().split(','),
-            "diagnosis":treatment.diagnosis,
-            "prescription":treatment.prescription,
-            "medicines":treatment.notes.split(';')[2].strip().split(',')
-        }
-        history.append(app_hist)
-    return render_template('patient_history.html',patient=patient,history=history,who=session.get('user_type'))
+        for treatment in treatments:
+            app_hist={
+                "visit_no":str(i),
+                "visit_type":treatment.notes.split(';')[0].strip(),
+                "tests_done":treatment.notes.split(';')[1].strip().split(','),
+                "diagnosis":treatment.diagnosis,
+                "prescription":treatment.prescription,
+                "medicines":treatment.notes.split(';')[2].strip().split(',')
+            }
+            history.append(app_hist)
+    if session.get('user_type')=='doctor':
+        if not doctor_id:
+            return redirect(404)
+        doctor=db.session.query(Doctor).filter_by(id=doctor_id).first()
+        if not doctor:
+            return redirect(404)
+    return render_template('patient_history.html',patient=patient,history=history,who=session.get('user_type'),doctor=doctor)
 
 @app.route('/logout',methods=["GET"])
 def logout():

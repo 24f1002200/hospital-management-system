@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Patient History</title>
+</head>
+<body>
+    <h1>Update Patient History</h1>
+    <p>Patient name : {{appointment.patient.username}}</p>
+    
+    <form action="/update/patient/history/{{appointment.id}}" method="post">
+        <label for="visity_type">Visit Type : </label>
+        <input type="text" name="visit_type" pattern="[^;]*" required>
+        <br>
+        <label for="test_done">Test Done : </label>
+        <input type="text" name="test_done" pattern="[^;]*" title="Comma separated only" required>
+        <br>
+        <label for="diagnosis">Diagnosis : </label>
+        <input type="text" name="diagnosis" pattern="[^;]*" required>
+        <br>
+        <label for="medicines">Medicines : </label>
+        <input type="text" name="medicines" pattern="[^;]*" title="Comma separated only" required>
+        <br>
+        <label for="prescription">Prescription : </label>
+        <input type="text" name="prescription" pattern="[^;]*" required>
+        <br>
+        <button type="submit">save</button>
+    </form>
+</body>
+</html>
