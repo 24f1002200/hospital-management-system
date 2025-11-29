@@ -25,7 +25,7 @@
         </div>
 
         <div class="doctor-list">
-            <table>
+            <table border="1">
             {% for doctor in doctor_list %}
                 <tr>
                     <td>{{doctor.username}}</td>
@@ -42,13 +42,13 @@
         <h2>Registered Patients</h2>
 
         <div class="patient-list">
-            <table>
+            <table border="1">
             {% for patient in patient_list %}
                 <tr>
                     <td>{{patient.username[8:]}}</td>
                     <td><a href="/update/patient/{{patient.username}}">edit</a></td>
                     <td><a href="/delete/patient/{{patient.username}}">delete</a></td>
-                    <td><a href="/blacklist/patient/{{patient.username}}">blacklist</a></td>
+                    <td><a href="/blacklist/patient/{{patient.username}}">{% if patient.blacklisted=="true" %}un{% endif %}blacklist</a></td>
                 </tr>
             {% endfor %}
             </table>
@@ -59,14 +59,14 @@
         <h2>Upcoming Appointments</h2>
 
         <div class="appointment-list">
-            <table>
-                <th>
+            <table border="1">
+                <tr>
                     <td>Sr. No.</td>
                     <td>Patient Name</td>
                     <td>Doctor Name</td>
                     <td>Department</td>
                     <td>Patient History</td>
-                </th>
+                </tr>
             {% for appointment in appointment_list %}
                 <tr>
                     <td>{{appointment.id}}</td>

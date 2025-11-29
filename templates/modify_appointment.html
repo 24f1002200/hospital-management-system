@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Availability</title>
+    <style>
+        .green{
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .red{
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .prev_slot{
+            border: 2px solid blue;
+            font-weight: bold;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Doctor's Availability</h1>
+    <button onclick="location.href='/patient/{{patient.username}}'">Back</button>
+    <form action="/appointment/patient/modify/{{appointment.id}}" method="post">
+        <table border="1">
+            {% for date, slots in availability.items() %}
+                <tr>
+                    <td>{{date}}</td>
+                    <td>
+                        <input 
+                            type="radio" 
+                            name="availability"
+                            value="{{date}};morning" 
+                            {% if not slots[0] %}disabled{% endif %}>
+                        <label class="{{ 'green' if slots[0] else 'red' }} {{'prev_slot' if date==slot.date and slot.time=='morning'}}">
+                            08:00 - 12:00 AM
+                        </label>
+                    </td>
+                    <td>
+                        <input 
+                            type="radio" 
+                            name="availability" 
+                            value="{{date}};afternoon" 
+                            {% if not slots[1] %}disabled{% endif %}>
+                        <label class="{{ 'green' if slots[1] else 'red' }} {{'prev_slot' if date==slot.date and slot.time=='afternoon'}}">
+                            04:00 - 09:00 PM
+                        </label>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        <button type="submit">modify</button>
+    </form>
+</body>
+</html>

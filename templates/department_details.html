@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Department</title>
+</head>
+<body>
+    <h1>{{department.department_name}} Department</h1>
+    <div class="department-details">
+        <h2>Overview</h2>
+        <p>{{department.description}}</p>
+    </div>
+    <div class="doctor-detials">
+        <h2>Doctor's List</h2>
+        <table border="1">
+            {% for doctor in department.doctors %}
+                {% if doctor.blacklisted=='false' %}
+                <tr>
+                    <td>{{doctor.username}}</td>
+                    <td><a href="/patient/doctor/availability/{{patient.id}}/{{doctor.id}}">Check Availability</a></td>
+                    <td><a href="/view/doctor/details/{{doctor.id}}/{{patient.id}}">View details</a></td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+    </div>
+    <button onclick="location.href='/patient/{{patient.username}}'">Go Back</button>
+</body>
+</html>

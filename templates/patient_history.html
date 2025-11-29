@@ -12,15 +12,15 @@
     <p>Doctor's name : Dr. {{patient.appointments[patient.appointments|length -1].doctor.username}}</p>
     <p>Department : {{patient.appointments[patient.appointments|length -1].doctor.departments[0]}}</p>
 
-    <table>
-        <th>
+    <table border="1">
+        <tr>
             <td>Visit No.</td>
             <td>Visit Type</td>
             <td>Tests Done</td>
             <td>Diagnosis</td>
             <td>Prescription</td>
             <td>Medicines</td>
-        </th>
+        </tr>
         {% for entry in history %}
             <tr>
                 <td>{{entry['visit_no']}}</td>
@@ -49,7 +49,7 @@
     {% endif %}
 
     <div class="button">
-        <button type="button" onclick="location.href='/{{who}}/{% if who == 'doctor' %}{{doctor.username}}{% endif %}'">Back</button>
+        <button type="button" onclick="location.href='/{{role}}/{% if role=='doctor' %}{{doctor.username}} {% elif role=='patient' %}{{patient.username}}{% endif %}'">Back</button>
     </div>
 </body>
 </html>

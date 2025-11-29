@@ -8,13 +8,13 @@
 <body>
     <h1>Welcome Doctor {{doc.username}}</h1>
     <h2>Upcoming Appointments</h2>
-    <table>
-        <th>
+    <table border="1">
+        <tr>
             <td>Sr No.</td>
             <td>Patient Name</td>
             <td>Patient History</td>
             <td>Actions</td>
-        </th>
+        </tr>
         {% for appointment in appointment_list %}
             <tr>
                 <td>{{appointment.id}}</td>
@@ -26,7 +26,7 @@
     </table>
 
     <h2>Assigned Patients</h2>
-    <table>
+    <table border="1">
         {% for patient in patient_list %}
             <tr>
                 <td>{{patient}}</td>
@@ -36,5 +36,7 @@
     </table>
 
     <p><a href="/doctor/update/availability/{{doc.id}}">Provide Availability</a></p>
+    <br>
+    <button type="button" onclick="location.href='/logout'">log out</button>
 </body>
 </html>

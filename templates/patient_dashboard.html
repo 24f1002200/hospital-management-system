@@ -7,5 +7,57 @@
 </head>
 <body>
     <h1>Welcome Patient {{pat.username}}</h1>
+    <div class="profile">
+        <h2>Profile </h2>
+        <a href="/update/patient/profile/{{pat.username}}">Edit profile</a> | 
+        <a href="/view/patient/{{pat.username}}">History</a> | 
+        <a href="/logout">logout</a>
+        {% if profile[0] %}
+            <p>Name : {{profile[0]}}</p>
+        {% endif %}
+        {% if profile [1] %}
+            <p>Contact : {{profile[1]}}</p>
+        {% endif %}
+    </div>
+
+    <div class="department-details">
+        <h2>Departments</h2>
+        <table border="1">
+            {% for department in departments %}
+                <tr>
+                    <td>{{department.department_name}}</td>
+                    <td><a href="/view/department/{{department.id}}/{{pat.id}}">View Details</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="upcoming-appointments">
+        <h2>Upcoming Appointments</h2>
+        <table border="1">
+            <tr>
+                <td>Sr.No.</td>
+                <td>Doctor name</td>
+                <td>Department</td>
+                <td>Date</td>
+                <td>Time</td>
+                <td>Actions</td>
+            </tr>
+            {% for appointment in appointments %}
+                <tr>
+                    <td>{{appointment.id}}</td>
+                    <td>{{appointment.doctor.username}}</td>
+                    <td>{{appointment.doctor.departments[0].department_name}}</td>
+                    <td>{{appointment.date}}</td>
+                    <td>{{appointment.time}}</td>
+                    <td>
+                        <a href="/appointment/patient/cancel/{{appointment.id}}">Cancel</a>
+                        <a href="/appointment/patient/modify/{{appointment.id}}">Modify</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
 </body>
 </html>
