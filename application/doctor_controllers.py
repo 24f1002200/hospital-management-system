@@ -69,7 +69,7 @@ def update_doctor_availability(doctor_id):
                 print("here")
                 morning_not_available='true' in slots
                 appointment = db.session.query(Appointment).filter_by(
-                    doctor_id=doctor_id, date=date_obj, time=datetime.strptime('08:00:00', '%H:%M:%S').time()
+                    doctor_id=doctor_id, date=date_obj, time=datetime.strptime('08:00:00', '%H:%M:%S').time(),status='Booked'
                 ).first()
                 if morning_not_available and not appointment:
                     patient=db.session.query(Patient).filter_by(username='patient-dummy_001').first()
@@ -84,7 +84,7 @@ def update_doctor_availability(doctor_id):
             if slot=='afternoon':
                 afternoon_not_available='true' in slots
                 appointment = db.session.query(Appointment).filter_by(
-                    doctor_id=doctor_id, date=date_obj, time=datetime.strptime('16:00:00', '%H:%M:%S').time()
+                    doctor_id=doctor_id, date=date_obj, time=datetime.strptime('16:00:00', '%H:%M:%S').time(),status='Booked'
                 ).first()
                 if afternoon_not_available and not appointment:
                     patient=db.session.query(Patient).filter_by(username='patient-dummy_001').first()
